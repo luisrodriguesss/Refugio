@@ -77,7 +77,13 @@ public class RefugioContext : DbContext
 
             entity.Property(r => r.Disponivel)
                 .HasColumnName("DISPONIVEL")
-                .IsRequired();
+                 .HasConversion(
+                 valor => valor ? "S" : "N",
+                 valor => valor == "S"
+                        )
+                        .HasColumnType("CHAR(1)")
+                        .IsRequired();
+
 
             entity.HasIndex(r => new { r.IdPonto, r.Tipo })
                 .IsUnique();
