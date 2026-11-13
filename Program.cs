@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Refugio.API.Data;
+using Oracle.EntityFrameworkCore.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +19,16 @@ if (string.IsNullOrWhiteSpace(connectionString))
     );
 }
 
+
 builder.Services.AddDbContext<RefugioContext>(options =>
-    options.UseOracle(connectionString));
+    options.UseOracle(
+        connectionString,
+        oracleOptions => oracleOptions.UseOracleSQLCompatibility(
+            OracleSQLCompatibility.DatabaseVersion19
+        )
+    )
+);
+
 
 builder.Services.AddSwaggerGen();
 
