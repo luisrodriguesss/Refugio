@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Refugio.API.Data;
 using Refugio.API.Models;
+using Refugio.API.DTOs;
 
 namespace Refugio.API.Controllers;
 
@@ -68,15 +69,11 @@ public class PontosController : ControllerBase
 
     // POST: api/pontos
     [HttpPost]
-    public async Task<IActionResult> Cadastrar([FromBody] Ponto ponto)
+    public async Task<IActionResult> Cadastrar(
+        [FromBody] PontoCreateDto dados)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         var codigoExistente = await _context.Pontos
-            .AnyAsync(p => p.CodigoPublico == ponto.CodigoPublico);
+            .AnyAsync(p => p.CodigoPublico == dados.CodigoPublico);
 
         if (codigoExistente)
         {
@@ -86,13 +83,30 @@ public class PontosController : ControllerBase
             });
         }
 
+        var ponto = new Ponto
+        {
+            CodigoPublico = dados.CodigoPublico,
+            Nome = dados.Nome,
+            Bairro = dados.Bairro,
+            HorarioTexto = dados.HorarioTexto,
+            Status = dados.Status
+        };
+
         _context.Pontos.Add(ponto);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(
             nameof(BuscarPorId),
             new { id = ponto.IdPonto },
-            ponto
+            new
+            {
+                ponto.IdPonto,
+                ponto.CodigoPublico,
+                ponto.Nome,
+                ponto.Bairro,
+                ponto.HorarioTexto,
+                ponto.Status
+            }
         );
     }
 
