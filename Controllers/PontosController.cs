@@ -95,4 +95,71 @@ public class PontosController : ControllerBase
             ponto
         );
     }
+
+    // PUT: api/pontos/1
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Atualizar(
+        int id,
+        [FromBody] Ponto dados)
+    {
+        var ponto = await _context.Pontos
+            .FindAsync(id);
+
+        if (ponto == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Ponto não encontrado."
+            });
+        }
+
+        // O código público não pode ser alterado.
+        if (dados.CodigoPublico != ponto.CodigoPublico)
+        {
+            return BadRequest(new
+            {
+                mensagem = "O código público não pode ser alterado."
+            });
+        }
+
+        ponto.Nome = dados.Nome;
+        ponto.Bairro = dados.Bairro;
+        ponto.HorarioTexto = dados.HorarioTexto;
+        ponto.Status = dados.Status;
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    // DELETE: api/pontos/1
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Excluir(int id)
+    {
+        var ponto = await _context.Pontos.FindAsync(id);
+
+        if (ponto == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Ponto não encontrado."
+            });
+        }
+
+        var possuiRecursos = await _context.Recursos
+            .AnyAsync(r => r.IdPonto == id);
+
+        if (possuiRecursos)
+        {
+            return Conflict(new
+            {
+                mensagem = "Não é possível excluir um ponto que possui recursos vinculados."
+            });
+        }
+
+        _context.Pontos.Remove(ponto);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
