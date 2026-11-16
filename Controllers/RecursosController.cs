@@ -119,7 +119,7 @@ public class RecursosController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Atualizar(
         int id,
-        [FromBody] Recurso dados)
+        [FromBody] RecursoUpdateDto dados)
     {
         var recurso = await _context.Recursos.FindAsync(id);
 

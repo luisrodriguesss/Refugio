@@ -114,25 +114,15 @@ public class PontosController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Atualizar(
         int id,
-        [FromBody] Ponto dados)
+        [FromBody] PontoUpdateDto dados)
     {
-        var ponto = await _context.Pontos
-            .FindAsync(id);
+        var ponto = await _context.Pontos.FindAsync(id);
 
         if (ponto == null)
         {
             return NotFound(new
             {
                 mensagem = "Ponto não encontrado."
-            });
-        }
-
-        // O código público não pode ser alterado.
-        if (dados.CodigoPublico != ponto.CodigoPublico)
-        {
-            return BadRequest(new
-            {
-                mensagem = "O código público não pode ser alterado."
             });
         }
 
