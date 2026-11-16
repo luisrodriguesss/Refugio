@@ -1,4 +1,4 @@
-
+using Oracle.ManagedDataAccess.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Refugio.API.Data;
@@ -99,8 +99,23 @@ public class RecursosController : ControllerBase
             Disponivel = dados.Disponivel
         };
 
-        _context.Recursos.Add(recurso);
-        await _context.SaveChangesAsync();
+        
+_context.Recursos.Add(recurso);
+
+try
+{
+    await _context.SaveChangesAsync();
+}
+catch (DbUpdateException ex)
+    when (ex.InnerException is OracleException oracleEx
+          && oracleEx.Number == 1)
+{
+    return Conflict(new
+    {
+        mensagem = "Esse recurso já está cadastrado neste ponto."
+    });
+}
+
 
         return CreatedAtAction(
             nameof(BuscarPorId),

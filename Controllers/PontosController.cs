@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Refugio.API.Data;
 using Refugio.API.Models;
 using Refugio.API.DTOs;
+using Oracle.ManagedDataAccess.Client;
 
 namespace Refugio.API.Controllers;
 
@@ -92,8 +93,23 @@ public class PontosController : ControllerBase
             Status = dados.Status
         };
 
-        _context.Pontos.Add(ponto);
-        await _context.SaveChangesAsync();
+        
+_context.Pontos.Add(ponto);
+
+try
+{
+    await _context.SaveChangesAsync();
+}
+catch (DbUpdateException ex)
+    when (ex.InnerException is OracleException oracleEx
+          && oracleEx.Number == 1)
+{
+    return Conflict(new
+    {
+        mensagem = "Já existe um ponto com esse código público."
+    });
+}
+
 
         return CreatedAtAction(
             nameof(BuscarPorId),
