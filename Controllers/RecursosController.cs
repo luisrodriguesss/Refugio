@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Refugio.API.Data;
+using Refugio.API.DTOs;
 using Refugio.API.Models;
 
 namespace Refugio.API.Controllers;
@@ -65,10 +66,10 @@ public class RecursosController : ControllerBase
     // POST: api/recursos
     [HttpPost]
     public async Task<IActionResult> Cadastrar(
-        [FromBody] Recurso recurso)
+        [FromBody] RecursoCreateDto dados)
     {
         var pontoExiste = await _context.Pontos
-            .AnyAsync(p => p.IdPonto == recurso.IdPonto);
+            .AnyAsync(p => p.IdPonto == dados.IdPonto);
 
         if (!pontoExiste)
         {
@@ -80,8 +81,8 @@ public class RecursosController : ControllerBase
 
         var recursoDuplicado = await _context.Recursos
             .AnyAsync(r =>
-                r.IdPonto == recurso.IdPonto &&
-                r.Tipo == recurso.Tipo);
+                r.IdPonto == dados.IdPonto &&
+                r.Tipo == dados.Tipo);
 
         if (recursoDuplicado)
         {
@@ -90,6 +91,13 @@ public class RecursosController : ControllerBase
                 mensagem = "Esse recurso já está cadastrado neste ponto."
             });
         }
+
+        var recurso = new Recurso
+        {
+            IdPonto = dados.IdPonto,
+            Tipo = dados.Tipo,
+            Disponivel = dados.Disponivel
+        };
 
         _context.Recursos.Add(recurso);
         await _context.SaveChangesAsync();
