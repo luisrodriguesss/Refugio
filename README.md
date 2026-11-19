@@ -276,6 +276,9 @@ Esta API é um protótipo acadêmico e não possui autenticação própria. Não
 - [Gabriel Stuani — RM566682]
 - [Guilherme Soares — RM568227]
 
+## Link vídeo
+- https://www.youtube.com/watch?v=5DLcR-1ZGps
+
 ## Considerações finais
 
 A API .NET do REFÚGIO demonstra a utilização de tecnologias de desenvolvimento backend e banco de dados relacional para gerenciar informações de pontos de alívio térmico.
